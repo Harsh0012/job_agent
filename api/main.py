@@ -23,13 +23,17 @@ RESULT_KEYS = (
 
 CORS_ORIGINS = [
     "http://localhost:4200",
-    os.getenv("FRONTEND_URL", "https://job-agent-frontend.onrender.com"),
+    os.getenv("FRONTEND_URL", ""),
 ]
+
+# Allow any onrender.com subdomain
+CORS_ORIGIN_REGEX = r"https://.*\.onrender\.com"
 
 app = FastAPI(title="Job Application Agent API")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=CORS_ORIGINS,
+    allow_origins=[o for o in CORS_ORIGINS if o],
+    allow_origin_regex=CORS_ORIGIN_REGEX,
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )

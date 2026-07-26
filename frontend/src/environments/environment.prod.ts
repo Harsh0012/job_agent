@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://job-agent-api.onrender.com/api',
+  apiUrl: 'https://job-agent-cmlj.onrender.com/api',
 };

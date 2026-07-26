@@ -1,0 +1,889 @@
+@use 'sass:color';
+
+// ── Design Tokens ──────────────────────────────────────────
+$primary: #6366f1;
+$primary-dark: #4f46e5;
+$primary-light: #a5b4fc;
+$accent: #06b6d4;
+$bg: #0f172a;
+$surface: #1e293b;
+$surface-light: #334155;
+$text: #f1f5f9;
+$text-muted: #94a3b8;
+$border: #334155;
+$danger: #f87171;
+$danger-bg: rgba(248, 113, 113, 0.1);
+$success: #34d399;
+$warning: #fbbf24;
+$card-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+$radius: 16px;
+$radius-sm: 10px;
+
+// ── Shell ──────────────────────────────────────────────────
+.app-shell {
+  min-height: 100vh;
+  color: $text;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+// ── Hero ───────────────────────────────────────────────────
+.hero {
+  position: relative;
+  text-align: center;
+  padding: 3.5rem 1.5rem 2.5rem;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 50%, #0c4a6e 100%);
+}
+
+.hero-glow {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba($primary, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+}
+
+.logo {
+  margin-bottom: 1rem;
+}
+
+.logo-icon {
+  font-size: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background: rgba($primary, 0.15);
+  border: 1px solid rgba($primary, 0.3);
+  border-radius: 18px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.hero h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  background: linear-gradient(135deg, $text 30%, $primary-light 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  color: $text-muted;
+  font-size: 1.05rem;
+  margin: 0;
+  max-width: 480px;
+  margin-inline: auto;
+  line-height: 1.5;
+}
+
+// ── Main ───────────────────────────────────────────────────
+.main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+// ── Input Section ──────────────────────────────────────────
+.input-section {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+
+  &.collapsed {
+    padding: 0;
+    background: transparent;
+    border: none;
+    margin-bottom: 0;
+    .input-grid,
+    .options-row,
+    .btn-analyze,
+    .error-banner { display: none; }
+  }
+}
+
+.input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    color: $text;
+  }
+
+  .label-icon { font-size: 1rem; }
+
+  .label-hint {
+    margin-left: auto;
+    font-weight: 400;
+    font-size: 0.75rem;
+    color: $text-muted;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 160px;
+    padding: 0.85rem 1rem;
+    background: $bg;
+    color: $text;
+    border: 2px solid $border;
+    border-radius: $radius-sm;
+    font-size: 0.9rem;
+    font-family: inherit;
+    resize: vertical;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+
+    &::placeholder { color: $text-muted; }
+    &:focus { outline: none; border-color: $primary; }
+  }
+}
+
+// ── File Upload ────────────────────────────────────────────
+.file-upload {
+  border: 2px dashed $border;
+  border-radius: $radius-sm;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: $bg;
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover, &.drag-over {
+    border-color: $primary;
+    background: rgba($primary, 0.05);
+  }
+
+  &.drag-over {
+    transform: scale(1.01);
+  }
+
+  &.has-file {
+    border-style: solid;
+    border-color: $success;
+    background: rgba($success, 0.04);
+    padding: 1.25rem 1.5rem;
+  }
+}
+
+.upload-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.upload-icon { font-size: 2rem; opacity: 0.7; }
+
+.upload-text {
+  color: $text-muted;
+  font-size: 0.9rem;
+  strong { color: $primary-light; }
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.file-icon { font-size: 1.6rem; }
+
+.file-details {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.file-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: $text;
+}
+
+.file-size {
+  font-size: 0.75rem;
+  color: $text-muted;
+}
+
+.file-remove {
+  margin-left: auto;
+  background: rgba($danger, 0.1);
+  border: none;
+  color: $danger;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+
+  &:hover { background: rgba($danger, 0.2); }
+}
+
+// ── Options Row ────────────────────────────────────────────
+.options-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+
+  .question-count {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: $text-muted;
+
+    select {
+      background: $surface;
+      color: $text;
+      border: 1px solid $border;
+      border-radius: $radius-sm;
+      padding: 0.4rem 0.7rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+
+      &:focus { border-color: $primary; outline: none; }
+    }
+  }
+}
+
+// ── New Analysis Button ────────────────────────────────────
+.results-header {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn-new-analysis,
+.btn-export-pdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: $surface-light;
+  color: $text;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $primary;
+    border-color: $primary;
+  }
+}
+
+// ── Analyze Button ─────────────────────────────────────────
+.btn-analyze {
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+  color: white;
+  border: none;
+  border-radius: $radius-sm;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 16px rgba($primary, 0.3);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba($primary, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.btn-arrow {
+  transition: transform 0.2s;
+  .btn-analyze:hover & { transform: translateX(3px); }
+}
+
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ── Error ──────────────────────────────────────────────────
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: $danger-bg;
+  border: 1px solid rgba($danger, 0.2);
+  border-radius: $radius-sm;
+  color: $danger;
+  font-size: 0.9rem;
+}
+
+.error-icon { font-size: 1.1rem; }
+
+// ── Pipeline Progress ──────────────────────────────────────
+.pipeline-section { margin-bottom: 2rem; }
+
+.pipeline-card {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius;
+  padding: 2rem;
+  text-align: center;
+
+  h2 {
+    font-size: 1.15rem;
+    margin: 0 0 1.5rem;
+    color: $text;
+  }
+}
+
+.pipeline-track {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  padding: 0 0.5rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 30px;
+    right: 30px;
+    height: 2px;
+    background: $border;
+  }
+}
+
+.pipeline-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  transition: opacity 0.3s;
+  opacity: 0.4;
+
+  &.active, &.done { opacity: 1; }
+}
+
+.step-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: $surface-light;
+  border: 2px solid $border;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  color: $success;
+  transition: all 0.3s;
+
+  .done & {
+    background: rgba($success, 0.15);
+    border-color: $success;
+  }
+
+  .active & {
+    border-color: $primary;
+    background: rgba($primary, 0.15);
+  }
+}
+
+.dot-pulse {
+  display: block;
+  width: 8px;
+  height: 8px;
+  background: $primary;
+  border-radius: 50%;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+}
+
+.step-icon { font-size: 1.1rem; }
+
+.step-label {
+  font-size: 0.7rem;
+  color: $text-muted;
+  white-space: nowrap;
+
+  .active & { color: $primary-light; font-weight: 600; }
+  .done & { color: $success; }
+}
+
+.pipeline-hint {
+  margin: 1.5rem 0 0;
+  color: $text-muted;
+  font-size: 0.8rem;
+}
+
+// ── Results Section ────────────────────────────────────────
+.results-section {
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cache-badge {
+  text-align: center;
+  color: $accent;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+  padding: 0.6rem 1rem;
+  background: rgba($accent, 0.08);
+  border: 1px solid rgba($accent, 0.2);
+  border-radius: $radius-sm;
+}
+
+// ── Score Row ──────────────────────────────────────────────
+.score-row {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  align-items: flex-start;
+}
+
+.score-ring {
+  position: relative;
+  flex-shrink: 0;
+  width: 120px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  svg {
+    width: 120px;
+    height: 120px;
+    transform: rotate(-90deg);
+  }
+
+  .ring-bg {
+    fill: none;
+    stroke: $surface-light;
+    stroke-width: 8;
+  }
+
+  .ring-fill {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dasharray 1s ease-out;
+  }
+
+  &.high .ring-fill { stroke: $success; }
+  &.mid .ring-fill { stroke: $warning; }
+  &.low .ring-fill { stroke: $danger; }
+}
+
+.score-value {
+  position: absolute;
+  top: 44%;
+  left: 54%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: baseline;
+}
+
+.score-num {
+  font-size: 2rem;
+  font-weight: 700;
+
+  .high & { color: $success; }
+  .mid & { color: $warning; }
+  .low & { color: $danger; }
+}
+
+.score-pct {
+  font-size: 0.9rem;
+  color: $text-muted;
+}
+
+.score-label {
+  display: block;
+  font-size: 0.7rem;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 0.35rem;
+}
+
+.summary-cards {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.s-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 0.85rem 1rem;
+  transition: border-color 0.2s;
+
+  &:hover { border-color: $primary; }
+
+  h3 { font-size: 0.9rem; margin: 0; }
+  p { font-size: 0.78rem; color: $text-muted; margin: 0; }
+}
+
+.s-card-icon {
+  font-size: 1.4rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  flex-shrink: 0;
+
+  .candidate & { background: rgba($primary, 0.12); }
+  .job & { background: rgba($accent, 0.12); }
+  .gaps-card & { background: rgba($warning, 0.12); }
+}
+
+// ── Skills Strip ───────────────────────────────────────────
+.skills-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
+}
+
+.skill-tag {
+  padding: 0.3rem 0.65rem;
+  background: rgba($primary, 0.1);
+  border: 1px solid rgba($primary, 0.2);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: $primary-light;
+}
+
+// ── Tabs ───────────────────────────────────────────────────
+.tabs {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  background: $surface;
+  padding: 0.35rem;
+  border-radius: $radius-sm;
+  border: 1px solid $border;
+
+  button {
+    flex: 1;
+    padding: 0.65rem 0.75rem;
+    border: none;
+    background: transparent;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: $text-muted;
+    cursor: pointer;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    transition: all 0.2s;
+
+    &.active {
+      background: $primary;
+      color: white;
+      box-shadow: 0 2px 8px rgba($primary, 0.35);
+    }
+
+    &:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.04);
+      color: $text;
+    }
+  }
+}
+
+.tab-icon { font-size: 0.9rem; }
+
+.tab-count {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+
+  .active & {
+    background: rgba(255, 255, 255, 0.25);
+  }
+}
+
+// ── Tab Content ────────────────────────────────────────────
+.tab-content {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius;
+  padding: 1.5rem;
+}
+
+// ── Gaps ───────────────────────────────────────────────────
+.gap-item {
+  padding: 1rem 0;
+  border-bottom: 1px solid $border;
+
+  &:last-child { border-bottom: none; }
+  &:first-child { padding-top: 0; }
+}
+
+.gap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.gap-name { font-weight: 600; font-size: 0.92rem; }
+
+.badge {
+  font-size: 0.68rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+
+  &.must-have {
+    background: rgba($danger, 0.12);
+    color: $danger;
+    border: 1px solid rgba($danger, 0.2);
+  }
+
+  &.nice-to-have {
+    background: rgba($warning, 0.12);
+    color: $warning;
+    border: 1px solid rgba($warning, 0.2);
+  }
+}
+
+.gap-assessment {
+  color: $text-muted;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+// ── Tailored Bullets (diff style) ──────────────────────────
+.bullet-item {
+  padding: 1rem 0;
+  border-bottom: 1px solid $border;
+
+  &:last-child { border-bottom: none; }
+  &:first-child { padding-top: 0; }
+}
+
+.bullet-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: $primary-light;
+  background: rgba($primary, 0.1);
+  border: 1px solid rgba($primary, 0.2);
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  margin-bottom: 0.6rem;
+}
+
+.bullet-row {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  margin-bottom: 0.25rem;
+
+  &.original {
+    background: rgba($danger, 0.06);
+    color: $text-muted;
+    text-decoration: line-through;
+  }
+
+  &.tailored {
+    background: rgba($success, 0.06);
+    color: $text;
+  }
+}
+
+.bullet-marker {
+  font-weight: 700;
+  font-family: monospace;
+  flex-shrink: 0;
+
+  .original & { color: $danger; }
+  .tailored & { color: $success; }
+}
+
+// ── Cover Letter ───────────────────────────────────────────
+.action-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.action-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid $border;
+  background: $surface-light;
+  color: $text;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: $primary;
+    color: $primary-light;
+    background: rgba($primary, 0.08);
+  }
+}
+
+.cover-text {
+  white-space: pre-wrap;
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  margin: 0;
+  color: $text;
+  background: rgba(0, 0, 0, 0.15);
+  padding: 1.25rem;
+  border-radius: $radius-sm;
+  border: 1px solid $border;
+}
+
+// ── Interview Questions ────────────────────────────────────
+.questions-list {
+  padding-left: 1.5rem;
+  margin: 0;
+  counter-reset: q;
+
+  li {
+    padding: 0.75rem 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    border-bottom: 1px solid $border;
+    color: $text;
+
+    &:last-child { border-bottom: none; }
+  }
+}
+
+// ── Empty State ────────────────────────────────────────────
+.empty-state {
+  text-align: center;
+  padding: 2.5rem 1rem;
+
+  .empty-icon { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; }
+  p { color: $text-muted; margin: 0; font-size: 0.95rem; }
+}
+
+// ── Footer ─────────────────────────────────────────────────
+.footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: $text-muted;
+  font-size: 0.78rem;
+
+  p { margin: 0; }
+}
+
+// ── Responsive ─────────────────────────────────────────────
+@media (max-width: 768px) {
+  .input-grid { grid-template-columns: 1fr; }
+
+  .score-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .summary-cards { width: 100%; }
+
+  .tabs button {
+    font-size: 0.75rem;
+    padding: 0.55rem 0.5rem;
+    .tab-icon { display: none; }
+  }
+
+  .pipeline-track {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+    &::before { display: none; }
+  }
+
+  .pipeline-step { flex: 0 0 30%; }
+}

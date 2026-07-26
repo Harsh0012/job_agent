@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+chroma_db/
+.pytest_cache/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+.slingshot/

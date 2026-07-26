@@ -1,0 +1,280 @@
+<div class="app-shell">
+  <!-- Hero Header -->
+  <header class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <div class="logo">
+        <span class="logo-icon">⚡</span>
+      </div>
+      <h1>Job Application Agent</h1>
+      <p class="subtitle">AI-powered resume analysis, gap detection, and tailored content generation</p>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- Input Section -->
+    <section class="input-section" [class.collapsed]="!!result()">
+      <div class="input-grid">
+        <div class="form-group">
+          <label>
+            <span class="label-icon">📄</span> Resume
+            <span class="label-hint">PDF or TXT, max 5 MB</span>
+          </label>
+          <div
+            class="file-upload"
+            [class.drag-over]="dragOver()"
+            [class.has-file]="!!resumeFile"
+            (click)="fileInput.click()"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave()"
+            (drop)="onDrop($event)"
+          >
+            <input #fileInput type="file" id="resume" accept=".pdf,.txt" (change)="onFileSelected($event)" hidden />
+            @if (resumeFile) {
+              <div class="file-info">
+                <span class="file-icon">{{ resumeFile.name.endsWith('.pdf') ? '📕' : '📃' }}</span>
+                <div class="file-details">
+                  <span class="file-name">{{ resumeFile.name }}</span>
+                  <span class="file-size">{{ (resumeFile.size / 1024).toFixed(1) }} KB</span>
+                </div>
+                <button class="file-remove" (click)="removeFile(); $event.stopPropagation()">✕</button>
+              </div>
+            } @else {
+              <div class="upload-prompt">
+                <span class="upload-icon">☁️</span>
+                <span class="upload-text">Drop your resume here or <strong>browse</strong></span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="jd">
+            <span class="label-icon">📋</span> Job Description
+          </label>
+          <textarea
+            id="jd"
+            [(ngModel)]="jobDescription"
+            rows="8"
+            placeholder="Paste the full job description here..."
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="options-row">
+        <label class="question-count">
+          <span class="label-icon">❓</span> Interview Questions
+          <select [(ngModel)]="numQuestions">
+            <option [value]="5">5</option>
+            <option [value]="10">10</option>
+            <option [value]="15">15</option>
+            <option [value]="20">20</option>
+            <option [value]="25">25</option>
+            <option [value]="30">30</option>
+          </select>
+        </label>
+      </div>
+
+      <button class="btn-analyze" (click)="onSubmit()" [disabled]="loading()">
+        @if (loading()) {
+          <span class="spinner"></span>
+          <span>Analyzing...</span>
+        } @else {
+          <span>Analyze & Generate</span>
+          <span class="btn-arrow">→</span>
+        }
+      </button>
+
+      @if (error()) {
+        <div class="error-banner">
+          <span class="error-icon">⚠️</span>
+          <span>{{ error() }}</span>
+        </div>
+      }
+    </section>
+
+    <!-- Pipeline Progress -->
+    @if (loading()) {
+      <section class="pipeline-section">
+        <div class="pipeline-card">
+          <h2>Running AI Pipeline</h2>
+          <div class="pipeline-track">
+            @for (step of pipelineSteps; track step.label; let i = $index) {
+              <div class="pipeline-step"
+                [class.active]="i === pipelineStep() + 1"
+                [class.done]="i <= pipelineStep()">
+                <div class="step-dot">
+                  @if (i <= pipelineStep()) {
+                    <span>✓</span>
+                  } @else if (i === pipelineStep() + 1) {
+                    <span class="dot-pulse"></span>
+                  }
+                </div>
+                <span class="step-icon">{{ step.icon }}</span>
+                <span class="step-label">{{ step.label }}</span>
+              </div>
+            }
+          </div>
+          <p class="pipeline-hint">This may take 30–60 seconds on the free tier</p>
+        </div>
+      </section>
+    }
+
+    <!-- Results -->
+    @if (result()) {
+      <section class="results-section">
+        <div class="results-header">
+          <button class="btn-new-analysis" (click)="resetAnalysis()">
+            <span>← New Analysis</span>
+          </button>
+          <button class="btn-export-pdf" (click)="exportPdf()">
+            <span>📥 Export PDF</span>
+          </button>
+        </div>
+
+        @if (result()!.cached) {
+          <div class="cache-badge">⚡ Instant result — loaded from cache</div>
+        }
+
+        <!-- Match Score & Summary -->
+        <div class="score-row">
+          <div class="score-ring" [class.high]="matchPct() >= 75" [class.mid]="matchPct() >= 50 && matchPct() < 75" [class.low]="matchPct() < 50">
+            <svg viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="52" class="ring-bg" />
+              <circle cx="60" cy="60" r="52" class="ring-fill"
+                [style.stroke-dasharray]="(matchPct() / 100 * 326.7) + ' 326.7'" />
+            </svg>
+            <div class="score-value">
+              <span class="score-num">{{ matchPct() }}</span>
+              <span class="score-pct">%</span>
+            </div>
+            <span class="score-label">Match</span>
+          </div>
+
+          <div class="summary-cards">
+            <div class="s-card candidate">
+              <div class="s-card-icon">👤</div>
+              <div class="s-card-body">
+                <h3>{{ result()!.resume_data.name }}</h3>
+                <p>{{ result()!.resume_data.skills.length }} skills · {{ result()!.resume_data.experience.length }} roles</p>
+              </div>
+            </div>
+            <div class="s-card job">
+              <div class="s-card-icon">🏢</div>
+              <div class="s-card-body">
+                <h3>{{ result()!.jd_data.title }}</h3>
+                <p>{{ result()!.jd_data.company }} · {{ result()!.jd_data.experience_years }}</p>
+              </div>
+            </div>
+            <div class="s-card gaps-card">
+              <div class="s-card-icon">🔍</div>
+              <div class="s-card-body">
+                <h3>{{ result()!.gaps.length }} Gap{{ result()!.gaps.length !== 1 ? 's' : '' }} Found</h3>
+                <p>of {{ result()!.jd_data.requirements.length }} requirements</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skills Tags -->
+        <div class="skills-strip">
+          @for (skill of result()!.resume_data.skills; track skill) {
+            <span class="skill-tag">{{ skill }}</span>
+          }
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <button [class.active]="activeTab() === 'gaps'" (click)="setTab('gaps')">
+            <span class="tab-icon">🎯</span> Gaps
+            <span class="tab-count">{{ result()!.gaps.length }}</span>
+          </button>
+          <button [class.active]="activeTab() === 'tailored'" (click)="setTab('tailored')">
+            <span class="tab-icon">✍️</span> Tailored
+          </button>
+          <button [class.active]="activeTab() === 'cover'" (click)="setTab('cover')">
+            <span class="tab-icon">📝</span> Cover Letter
+          </button>
+          <button [class.active]="activeTab() === 'questions'" (click)="setTab('questions')">
+            <span class="tab-icon">💬</span> Interview Qs
+          </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+          @if (activeTab() === 'gaps') {
+            @if (result()!.gaps && result()!.gaps.length > 0) {
+              @for (gap of result()!.gaps; track gap.requirement) {
+                <div class="gap-item">
+                  <div class="gap-header">
+                    <span class="gap-name">{{ gap.requirement }}</span>
+                    <span class="badge" [class.must-have]="gap.importance === 'must-have'" [class.nice-to-have]="gap.importance === 'nice-to-have'">
+                      {{ gap.importance }}
+                    </span>
+                  </div>
+                  <p class="gap-assessment">{{ gap.assessment }}</p>
+                </div>
+              }
+            } @else {
+              <div class="empty-state">
+                <span class="empty-icon">🎉</span>
+                <p>No gaps found — your resume is a great match!</p>
+              </div>
+            }
+          }
+
+          @if (activeTab() === 'tailored') {
+            @if (result()!.tailored_bullets && result()!.tailored_bullets.length > 0) {
+              @for (bullet of result()!.tailored_bullets; track bullet.gap_addressed) {
+                <div class="bullet-item">
+                  <div class="bullet-badge">{{ bullet.gap_addressed }}</div>
+                  @if (bullet.original !== 'NEW') {
+                    <div class="bullet-row original">
+                      <span class="bullet-marker">−</span>
+                      <span>{{ bullet.original }}</span>
+                    </div>
+                  }
+                  <div class="bullet-row tailored">
+                    <span class="bullet-marker">+</span>
+                    <span>{{ bullet.tailored }}</span>
+                  </div>
+                </div>
+              }
+            } @else {
+              <div class="empty-state">
+                <span class="empty-icon">✨</span>
+                <p>No tailored bullets needed — your resume already covers everything!</p>
+              </div>
+            }
+          }
+
+          @if (activeTab() === 'cover') {
+            <div class="cover-letter">
+              <div class="action-bar">
+                <button class="action-btn" (click)="copyToClipboard(result()!.cover_letter)">
+                  {{ copySuccess() ? '✅ Copied!' : '📋 Copy to clipboard' }}
+                </button>
+                <button class="action-btn" (click)="downloadAsText(result()!.cover_letter, 'cover_letter.txt')">
+                  ⬇️ Download .txt
+                </button>
+              </div>
+              <pre class="cover-text">{{ result()!.cover_letter }}</pre>
+            </div>
+          }
+
+          @if (activeTab() === 'questions') {
+            <ol class="questions-list">
+              @for (q of result()!.interview_questions; track q) {
+                <li>{{ q }}</li>
+              }
+            </ol>
+          }
+        </div>
+      </section>
+    }
+  </main>
+
+  <footer class="footer">
+    <p>Built with LangGraph · Groq · Angular · FastAPI</p>
+  </footer>
+</div>

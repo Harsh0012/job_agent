@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, timeout, retry, timer } from 'rxjs';
 import { AnalysisResult } from '../models/analysis.model';
+import { environment } from '../../environments/environment';
 
 export interface SSEStepEvent {
   node: string;
@@ -12,7 +13,7 @@ export interface SSEStepEvent {
   providedIn: 'root'
 })
 export class ApiService {
-  private readonly baseUrl = 'http://localhost:8000/api';
+  private readonly baseUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 

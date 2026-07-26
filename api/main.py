@@ -10,6 +10,8 @@ from fastapi.responses import StreamingResponse
 from agent.pipeline import run_pipeline, run_pipeline_stream
 from api.file_parser import extract_text
 
+import os
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -19,11 +21,16 @@ RESULT_KEYS = (
     "tailored_bullets", "cover_letter", "interview_questions",
 )
 
+CORS_ORIGINS = [
+    "http://localhost:4200",
+    os.getenv("FRONTEND_URL", "https://job-agent-frontend.onrender.com"),
+]
+
 app = FastAPI(title="Job Application Agent API")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"],
-    allow_methods=["*"],
+    allow_origins=CORS_ORIGINS,
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 

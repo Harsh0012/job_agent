@@ -1,15 +1,16 @@
-"""API endpoint tests — requires the FastAPI server running on port 8000."""
+"""API endpoint tests — uses FastAPI TestClient (no running server needed)."""
 
-import httpx
 import pytest
+from fastapi.testclient import TestClient
 
+from api.main import app
 from tests.conftest import SAMPLE_RESUME, SAMPLE_JD
 
-BASE = "http://127.0.0.1:8000"
+client = TestClient(app)
 
 
-def _post_analyze(files=None, data=None, timeout=30):
-    return httpx.post(f"{BASE}/api/analyze", files=files, data=data, timeout=timeout)
+def _post_analyze(files=None, data=None):
+    return client.post("/api/analyze", files=files, data=data)
 
 
 def _resume_file(content: bytes = b"", name: str = "resume.txt", mime: str = "text/plain"):
@@ -18,7 +19,7 @@ def _resume_file(content: bytes = b"", name: str = "resume.txt", mime: str = "te
 
 class TestHealth:
     def test_returns_ok(self):
-        r = httpx.get(f"{BASE}/api/health")
+        r = client.get("/api/health")
         assert r.status_code == 200
         assert r.json()["status"] == "ok"
 
@@ -28,7 +29,6 @@ class TestAnalyzeSuccess:
         r = _post_analyze(
             files=_resume_file(),
             data={"job_description": SAMPLE_JD},
-            timeout=120,
         )
         assert r.status_code == 200
         body = r.json()
@@ -40,7 +40,6 @@ class TestAnalyzeSuccess:
         r = _post_analyze(
             files=_resume_file(),
             data={"job_description": SAMPLE_JD},
-            timeout=120,
         )
         assert r.status_code == 200
         assert r.json()["cached"] is True

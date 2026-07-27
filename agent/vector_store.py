@@ -9,11 +9,12 @@ import chromadb
 logger = logging.getLogger(__name__)
 
 SIMILARITY_THRESHOLD = 0.85
-_COLLECTION_NAME = "jd_analyses"
-_CACHEABLE_KEYS = (
+CACHEABLE_KEYS = (
     "resume_data", "jd_data", "gaps",
     "tailored_bullets", "cover_letter", "interview_questions",
 )
+
+_COLLECTION_NAME = "jd_analyses"
 
 try:
     _client = chromadb.PersistentClient(path="chroma_db")
@@ -48,7 +49,7 @@ def store_analysis(jd_text: str, result: dict) -> None:
         logger.warning("Chroma not available, skipping cache store.")
         return
 
-    cacheable = {k: result.get(k) for k in _CACHEABLE_KEYS}
+    cacheable = {k: result.get(k) for k in CACHEABLE_KEYS}
     _collection.add(
         documents=[jd_text],
         metadatas=[{"result_json": json.dumps(cacheable)}],

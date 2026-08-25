@@ -13,7 +13,7 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 # max_retries=0 disables the SDK's internal retry loop on 429s
-llm = ChatGoogleGenerativeAI(model="gemini-3.6-flash", max_retries=0)
+llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", max_retries=0)
 
 MAX_RETRIES = 3
 _RATE_LIMIT_KEYWORDS = ("resource_exhausted", "rate_limit", "429")

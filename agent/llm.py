@@ -1,6 +1,7 @@
 """LLM configuration and retry logic."""
 
 import logging
+import os
 import re
 import time
 from typing import Type
@@ -12,10 +13,12 @@ from pydantic import BaseModel
 load_dotenv()
 logger = logging.getLogger(__name__)
 
+MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
 # max_retries=0 disables the SDK's internal retry loop on 429s
-llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", max_retries=0)
+llm = ChatGoogleGenerativeAI(model=MODEL_NAME, max_retries=0)
+logger.info(f"Using model: {MODEL_NAME}")
 
-MAX_RETRIES = 3
+MAX_RETRIES = 2
 _RATE_LIMIT_KEYWORDS = ("resource_exhausted", "rate_limit", "429")
 _TRANSIENT_KEYWORDS = ("timeout", "connection", "503", "overloaded")
 

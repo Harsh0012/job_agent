@@ -49,7 +49,8 @@ def _validate_inputs(content: bytes, resume_content_type: str, job_description: 
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok"}
+    key = os.getenv("GOOGLE_API_KEY", "")
+    return {"status": "ok", "llm_configured": bool(key)}
 
 
 @app.post("/api/analyze")

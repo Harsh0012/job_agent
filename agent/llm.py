@@ -21,10 +21,11 @@ _RETRYABLE_KEYWORDS = ("rate_limit", "429", "timeout", "connection", "503", "ove
 
 def _normalize_content(response):
     """Gemini returns content as a list of parts; extract the text."""
-    if isinstance(response.content, list):
+    content = getattr(response, "content", None)
+    if isinstance(content, list):
         response.content = "\n".join(
             part.get("text", "") if isinstance(part, dict) else str(part)
-            for part in response.content
+            for part in content
         )
     return response
 

@@ -5,18 +5,18 @@ import time
 from typing import Type
 
 from dotenv import load_dotenv
-from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel
 
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0)
+llm = ChatGoogleGenerativeAI(model="gemini-3.6-flash")
 
 MAX_RETRIES = 3
 RETRY_DELAY = 5
 
-_RETRYABLE_KEYWORDS = ("rate_limit", "429", "timeout", "connection", "503", "overloaded")
+_RETRYABLE_KEYWORDS = ("rate_limit", "429", "timeout", "connection", "503", "overloaded", "resource_exhausted")
 
 
 def invoke_with_retry(llm_instance, prompt: str, node_name: str):

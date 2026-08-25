@@ -1,6 +1,7 @@
 """LLM configuration and retry logic."""
 
 import logging
+import re
 import time
 from typing import Type
 
@@ -11,12 +12,20 @@ from pydantic import BaseModel
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-llm = ChatGoogleGenerativeAI(model="gemini-3.6-flash")
+# max_retries=0 disables the SDK's internal retry loop on 429s
+llm = ChatGoogleGenerativeAI(model="gemini-3.6-flash", max_retries=0)
 
 MAX_RETRIES = 3
-RETRY_DELAY = 5
+_RATE_LIMIT_KEYWORDS = ("resource_exhausted", "rate_limit", "429")
+_TRANSIENT_KEYWORDS = ("timeout", "connection", "503", "overloaded")
 
-_RETRYABLE_KEYWORDS = ("rate_limit", "429", "timeout", "connection", "503", "overloaded", "resource_exhausted")
+
+def _parse_retry_delay(error_msg: str) -> float:
+    """Extract the server-suggested retry delay from the error message."""
+    match = re.search(r"retry in ([\d.]+)s", error_msg, re.IGNORECASE)
+    if match:
+        return min(float(match.group(1)) + 1.0, 65.0)
+    return 62.0
 
 
 def _normalize_content(response):
@@ -37,10 +46,16 @@ def invoke_with_retry(llm_instance, prompt: str, node_name: str):
             return _normalize_content(llm_instance.invoke(prompt))
         except Exception as e:
             error_msg = str(e).lower()
-            retryable = any(kw in error_msg for kw in _RETRYABLE_KEYWORDS)
-            if retryable and attempt < MAX_RETRIES:
-                wait = RETRY_DELAY * attempt
-                logger.warning(f"[{node_name}] Attempt {attempt} failed: {e}. Retrying in {wait}s...")
+            is_rate_limit = any(kw in error_msg for kw in _RATE_LIMIT_KEYWORDS)
+            is_transient = any(kw in error_msg for kw in _TRANSIENT_KEYWORDS)
+
+            if is_rate_limit and attempt < MAX_RETRIES:
+                wait = _parse_retry_delay(error_msg)
+                logger.warning(f"[{node_name}] Rate limited (attempt {attempt}). Waiting {wait:.0f}s...")
+                time.sleep(wait)
+            elif is_transient and attempt < MAX_RETRIES:
+                wait = 5 * attempt
+                logger.warning(f"[{node_name}] Transient error (attempt {attempt}). Retrying in {wait}s...")
                 time.sleep(wait)
             else:
                 logger.error(f"[{node_name}] Failed after {attempt} attempt(s): {e}")

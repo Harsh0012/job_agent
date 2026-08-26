@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 SIMILARITY_THRESHOLD = 0.85
 CACHEABLE_KEYS = (
-    "resume_data", "jd_data", "gaps",
+    "resume_data", "jd_data", "gaps", "candidate_score", "recruiter_insights",
     "tailored_bullets", "cover_letter", "interview_questions",
 )
 

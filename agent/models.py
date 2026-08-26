@@ -43,10 +43,18 @@ class Gap(BaseModel):
     assessment: str = Field(description="Brief explanation of why this is a gap")
 
 
+class RecruiterInsight(BaseModel):
+    hiring_risks: list[str] = Field(description="Key risks a recruiter should consider before hiring this candidate")
+    recommendation: str = Field(description="Brief recruiter recommendation: 'Strong Hire', 'Hire', 'Lean Hire', 'Lean No Hire', or 'No Hire'")
+    justification: str = Field(description="2-3 sentence explanation supporting the recommendation")
+
+
 class GapAnalysis(BaseModel):
     gaps: list[Gap] = Field(description="Requirements the resume does NOT fully satisfy")
     strengths: list[str] = Field(description="Requirements the resume clearly meets")
     overall_match_pct: int = Field(description="Estimated match percentage 0-100")
+    candidate_score: int = Field(description="Recruiter score 1-10 indicating how strongly to consider this candidate")
+    recruiter_insights: RecruiterInsight = Field(description="Recruiter-perspective analysis of the candidate")
 
 
 class TailoredBullet(BaseModel):

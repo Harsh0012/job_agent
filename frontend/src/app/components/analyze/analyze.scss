@@ -288,6 +288,34 @@ $radius-sm: 10px;
   display: flex;
   gap: 0.75rem;
   margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.view-toggle {
+  display: flex;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  margin-left: auto;
+
+  button {
+    background: none;
+    color: $text-muted;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &.active {
+      background: $primary;
+      color: #fff;
+    }
+    &:hover:not(.active) {
+      background: $surface-light;
+    }
+  }
 }
 
 .btn-new-analysis,
@@ -607,6 +635,13 @@ $radius-sm: 10px;
   .candidate & { background: rgba($primary, 0.12); }
   .job & { background: rgba($accent, 0.12); }
   .gaps-card & { background: rgba($warning, 0.12); }
+  .score-card & { background: rgba($success, 0.12); }
+}
+
+.score-card {
+  &.high { border-color: $success; }
+  &.mid { border-color: $warning; }
+  &.low { border-color: $danger; }
 }
 
 // ── Skills Strip ───────────────────────────────────────────
@@ -886,4 +921,87 @@ $radius-sm: 10px;
   }
 
   .pipeline-step { flex: 0 0 30%; }
+}
+
+// ── Recruiter Panel ────────────────────────────────────────
+.recruiter-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.recruiter-verdict {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  border-radius: $radius-sm;
+  border: 1px solid $border;
+  background: $surface;
+
+  &.positive { border-color: $success; background: rgba($success, 0.05); }
+  &.neutral { border-color: $warning; background: rgba($warning, 0.05); }
+  &.negative { border-color: $danger; background: rgba($danger, 0.05); }
+}
+
+.verdict-score {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+
+  span { font-size: 1.2rem; color: $text-muted; font-weight: 400; }
+  .positive & { color: $success; }
+  .neutral & { color: $warning; }
+  .negative & { color: $danger; }
+}
+
+.verdict-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: $text;
+}
+
+.recruiter-section {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 1rem 1.25rem;
+
+  h4 {
+    font-size: 0.85rem;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 0.6rem;
+  }
+
+  p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: $text;
+    margin: 0;
+  }
+}
+
+.risk-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  li {
+    padding: 0.6rem 0.85rem;
+    background: rgba($danger, 0.08);
+    border: 1px solid rgba($danger, 0.15);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: $text;
+
+    &::before {
+      content: '⚠ ';
+      color: $danger;
+    }
+  }
 }

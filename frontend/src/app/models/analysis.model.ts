@@ -3,6 +3,8 @@ export interface AnalysisResult {
   resume_data: ResumeData;
   jd_data: JDData;
   gaps: Gap[];
+  candidate_score: number;
+  recruiter_insights: RecruiterInsights;
   tailored_bullets: TailoredBullet[];
   cover_letter: string;
   interview_questions: string[];
@@ -46,6 +48,12 @@ export interface Gap {
   requirement: string;
   importance: string;
   assessment: string;
+}
+
+export interface RecruiterInsights {
+  hiring_risks: string[];
+  recommendation: string;
+  justification: string;
 }
 
 export interface TailoredBullet {

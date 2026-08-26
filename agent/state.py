@@ -10,6 +10,8 @@ class AgentState(TypedDict, total=False):
     resume_data: dict
     jd_data: dict
     gaps: list
+    candidate_score: int
+    recruiter_insights: dict
     tailored_bullets: list
     cover_letter: str
     interview_questions: list

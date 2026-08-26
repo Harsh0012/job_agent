@@ -5,7 +5,7 @@ from unittest.mock import patch, MagicMock
 import pytest
 
 from agent.models import (
-    ResumeData, JDData, GapAnalysis, Gap,
+    ResumeData, JDData, GapAnalysis, Gap, RecruiterInsight,
     TailoredBullets, TailoredBullet, InterviewQuestions,
 )
 from agent.nodes import (
@@ -40,6 +40,12 @@ MOCK_GAP_ANALYSIS = GapAnalysis(
     gaps=[Gap(requirement="Docker", importance="nice-to-have", assessment="No Docker experience listed.")],
     strengths=["Python", "SQL"],
     overall_match_pct=80,
+    candidate_score=7,
+    recruiter_insights=RecruiterInsight(
+        hiring_risks=["No containerization experience"],
+        recommendation="Hire",
+        justification="Strong Python skills offset the Docker gap which can be learned on the job.",
+    ),
 )
 
 MOCK_TAILORED_BULLETS = TailoredBullets(
@@ -95,8 +101,13 @@ class TestGapAnalysis:
         result = gap_analysis(state)
         assert len(result["gaps"]) == 1
         assert result["gaps"][0]["requirement"] == "Docker"
+        assert result["candidate_score"] == 7
+        assert result["recruiter_insights"]["recommendation"] == "Hire"
 
-    @patch("agent.nodes.structured_invoke", return_value=GapAnalysis(gaps=[], strengths=["all"], overall_match_pct=100))
+    @patch("agent.nodes.structured_invoke", return_value=GapAnalysis(
+        gaps=[], strengths=["all"], overall_match_pct=100, candidate_score=9,
+        recruiter_insights=RecruiterInsight(hiring_risks=[], recommendation="Strong Hire", justification="Excellent fit."),
+    ))
     def test_no_gaps(self, mock_invoke):
         state = {
             "resume_data": MOCK_RESUME_DATA.model_dump(),

@@ -127,6 +127,10 @@
           <button class="btn-new-analysis" (click)="resetAnalysis()">
             <span>← New Analysis</span>
           </button>
+          <div class="view-toggle">
+            <button [class.active]="viewMode() === 'candidate'" (click)="toggleViewMode()">👤 Candidate</button>
+            <button [class.active]="viewMode() === 'recruiter'" (click)="toggleViewMode()">🏢 Recruiter</button>
+          </div>
           <button class="btn-export-pdf" (click)="exportPdf()">
             <span>📥 Export PDF</span>
           </button>
@@ -166,13 +170,23 @@
                 <p>{{ result()!.jd_data.company }} · {{ result()!.jd_data.experience_years }}</p>
               </div>
             </div>
-            <div class="s-card gaps-card">
-              <div class="s-card-icon">🔍</div>
-              <div class="s-card-body">
-                <h3>{{ result()!.gaps.length }} Gap{{ result()!.gaps.length !== 1 ? 's' : '' }} Found</h3>
-                <p>of {{ result()!.jd_data.requirements.length }} requirements</p>
+            @if (viewMode() === 'recruiter') {
+              <div class="s-card score-card" [class.high]="result()!.candidate_score >= 7" [class.mid]="result()!.candidate_score >= 4 && result()!.candidate_score < 7" [class.low]="result()!.candidate_score < 4">
+                <div class="s-card-icon">⭐</div>
+                <div class="s-card-body">
+                  <h3>{{ result()!.candidate_score }} / 10</h3>
+                  <p>{{ result()!.recruiter_insights.recommendation }}</p>
+                </div>
               </div>
-            </div>
+            } @else {
+              <div class="s-card gaps-card">
+                <div class="s-card-icon">🔍</div>
+                <div class="s-card-body">
+                  <h3>{{ result()!.gaps.length }} Gap{{ result()!.gaps.length !== 1 ? 's' : '' }} Found</h3>
+                  <p>of {{ result()!.jd_data.requirements.length }} requirements</p>
+                </div>
+              </div>
+            }
           </div>
         </div>
 
@@ -189,15 +203,22 @@
             <span class="tab-icon">🎯</span> Gaps
             <span class="tab-count">{{ result()!.gaps.length }}</span>
           </button>
-          <button [class.active]="activeTab() === 'tailored'" (click)="setTab('tailored')">
-            <span class="tab-icon">✍️</span> Tailored
-          </button>
-          <button [class.active]="activeTab() === 'cover'" (click)="setTab('cover')">
-            <span class="tab-icon">📝</span> Cover Letter
-          </button>
-          <button [class.active]="activeTab() === 'questions'" (click)="setTab('questions')">
-            <span class="tab-icon">💬</span> Interview Qs
-          </button>
+          @if (viewMode() === 'candidate') {
+            <button [class.active]="activeTab() === 'tailored'" (click)="setTab('tailored')">
+              <span class="tab-icon">✍️</span> Tailored
+            </button>
+            <button [class.active]="activeTab() === 'cover'" (click)="setTab('cover')">
+              <span class="tab-icon">📝</span> Cover Letter
+            </button>
+            <button [class.active]="activeTab() === 'questions'" (click)="setTab('questions')">
+              <span class="tab-icon">💬</span> Interview Qs
+            </button>
+          }
+          @if (viewMode() === 'recruiter') {
+            <button [class.active]="activeTab() === 'recruiter'" (click)="setTab('recruiter')">
+              <span class="tab-icon">📊</span> Recruiter Insights
+            </button>
+          }
         </div>
 
         <!-- Tab Content -->
@@ -269,12 +290,35 @@
               }
             </ol>
           }
+
+          @if (activeTab() === 'recruiter') {
+            <div class="recruiter-panel">
+              <div class="recruiter-verdict" [class.positive]="result()!.candidate_score >= 7" [class.neutral]="result()!.candidate_score >= 4 && result()!.candidate_score < 7" [class.negative]="result()!.candidate_score < 4">
+                <div class="verdict-score">{{ result()!.candidate_score }}<span>/10</span></div>
+                <div class="verdict-label">{{ result()!.recruiter_insights.recommendation }}</div>
+              </div>
+              <div class="recruiter-section">
+                <h4>Justification</h4>
+                <p>{{ result()!.recruiter_insights.justification }}</p>
+              </div>
+              @if (result()!.recruiter_insights.hiring_risks.length > 0) {
+                <div class="recruiter-section">
+                  <h4>Hiring Risks</h4>
+                  <ul class="risk-list">
+                    @for (risk of result()!.recruiter_insights.hiring_risks; track risk) {
+                      <li>{{ risk }}</li>
+                    }
+                  </ul>
+                </div>
+              }
+            </div>
+          }
         </div>
       </section>
     }
   </main>
 
   <footer class="footer">
-    <p>Built with LangGraph · Groq · Angular · FastAPI</p>
+    <p>Built with LangGraph · Gemini · Angular · FastAPI</p>
   </footer>
 </div>

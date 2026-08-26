@@ -18,7 +18,8 @@ export class Analyze implements OnDestroy {
   result = signal<AnalysisResult | null>(null);
   loading = signal(false);
   error = signal('');
-  activeTab = signal<'gaps' | 'tailored' | 'cover' | 'questions'>('gaps');
+  viewMode = signal<'candidate' | 'recruiter'>('candidate');
+  activeTab = signal<'gaps' | 'tailored' | 'cover' | 'questions' | 'recruiter'>('gaps');
   copySuccess = signal(false);
   pipelineStep = signal(0);
   dragOver = signal(false);
@@ -155,8 +156,14 @@ export class Analyze implements OnDestroy {
     );
   }
 
-  setTab(tab: 'gaps' | 'tailored' | 'cover' | 'questions'): void {
+  setTab(tab: 'gaps' | 'tailored' | 'cover' | 'questions' | 'recruiter'): void {
     this.activeTab.set(tab);
+  }
+
+  toggleViewMode(): void {
+    const next = this.viewMode() === 'candidate' ? 'recruiter' : 'candidate';
+    this.viewMode.set(next);
+    this.activeTab.set(next === 'recruiter' ? 'gaps' : 'gaps');
   }
 
   copyToClipboard(text: string): void {
@@ -187,6 +194,7 @@ export class Analyze implements OnDestroy {
     this.loading.set(false);
     this.pipelineStep.set(0);
     this.activeTab.set('gaps');
+    this.viewMode.set('candidate');
   }
 
   exportPdf(): void {

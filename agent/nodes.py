@@ -38,11 +38,17 @@ def gap_analysis(state: AgentState) -> dict:
         GapAnalysis,
         f"Compare this resume against the job description requirements. "
         f"Identify which requirements are NOT met (gaps) and which ARE met (strengths). "
-        f"Be realistic — partial matches count as gaps.\n\n"
+        f"Be realistic — partial matches count as gaps.\n"
+        f"Also evaluate from a RECRUITER perspective: assess hiring risks, "
+        f"give a candidate score (1-10), and provide a hire recommendation.\n\n"
         f"RESUME DATA:\n{resume_json}\n\nJOB DESCRIPTION DATA:\n{jd_json}",
         "gap_analysis",
     )
-    return {"gaps": [g.model_dump() for g in result.gaps]}
+    return {
+        "gaps": [g.model_dump() for g in result.gaps],
+        "candidate_score": result.candidate_score,
+        "recruiter_insights": result.recruiter_insights.model_dump(),
+    }
 
 
 def tailor_resume(state: AgentState) -> dict:
